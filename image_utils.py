@@ -3,29 +3,31 @@ import numpy as np
 from scipy.signal import convolve2d
 
 def load_image(path):
-    # טעינת התמונה והפיכתה למערך נומפי [cite: 2]
-    image = Image.open(path).convert("RGB")
+    # טעינת התמונה ללא כפיית RGB כדי לאפשר השוואה בטסטים
+    image = Image.open(path)
     return np.array(image)
 
 def edge_detection(image):
-    # הפיכת המערך לתמונה אפורה על-ידי מיצוע שלושת ערוצי הצבע [cite: 6, 7]
-    gray = np.mean(image, axis=2).astype(np.float64)
+    # בדיקה: אם התמונה היא צבעונית (3 ערוצים), נבצע מיצוע
+    if image.ndim == 3:
+        gray = np.mean(image, axis=2).astype(np.float64) [cite: 7]
+    else:
+        gray = image.astype(np.float64)
     
-    # בניית פילטר לשינויים בכיוון האנכי (kernelY) [cite: 8, 10]
+    # הגדרת הפילטרים בדיוק לפי סעיף 2 בנספח 
     kernelY = np.array([[1, 2, 1], 
                         [0, 0, 0], 
                         [-1, -2, -1]])
     
-    # בניית פילטר לשינויים בכיוון האופקי (kernelX) [cite: 9, 10]
     kernelX = np.array([[1, 0, -1], 
                         [2, 0, -2], 
                         [1, 0, -1]])
     
-    # הפעלת הקונבולוציה עם padding=0 ושמירה על גודל תמונה מקורי [cite: 12, 13]
-    edgeY = convolve2d(gray, kernelY, mode="same", boundary="fill", fillvalue=0)
-    edgeX = convolve2d(gray, kernelX, mode="same", boundary="fill", fillvalue=0)
+    # ביצוע קונבולוציה עם padding=0 (fillvalue=0) ושמירה על גודל מקורי [cite: 13]
+    edgeY = convolve2d(gray, kernelY, mode="same", boundary="fill", fillvalue=0) [cite: 12]
+    edgeX = convolve2d(gray, kernelX, mode="same", boundary="fill", fillvalue=0) [cite: 12]
     
-    # חישוב עוצמת הקצוות לפי הנוסחה [cite: 18, 19]
+    # חישוב עוצמת הקצוות לפי הנוסחה [cite: 19]
     edgeMAG = np.sqrt(edgeX**2 + edgeY**2)
     
     return edgeMAG
