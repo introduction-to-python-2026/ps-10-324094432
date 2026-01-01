@@ -5,25 +5,26 @@ from skimage.morphology import ball
 from PIL import Image
 from image_utils import load_image, edge_detection
 
-# טעינת התמונה
-image_path = "street.jpg" 
-img = load_image(image_path)
+# 1. טעינת תמונת הצבע ששלחת [cite: 21]
+img = load_image("street.jpg")
 
-# ניקוי רעשים בעזרת פילטר חציוני ball(3) לפי ההוראות [cite: 26]
-# skimage יודע לטפל ב-ball(3) על תמונת RGB אם מעבירים אותה ככה
+# 2. סינון רעשים בעזרת פילטר חציוני ball(3) [cite: 24, 26]
+# הפונקציה median תטפל בכל ערוץ בנפרד באופן אוטומטי
 clean_image = median(img, ball(3))
 
-# זיהוי קצוות
+# 3. הרצת פונקציית זיהוי הקצוות [cite: 28]
 edges = edge_detection(clean_image)
 
-# יצירת תמונה בינארית לפי ערך סף 
+# 4. הפיכת המערך לבינארי על-ידי בחירת ערך סף (למשל 50) [cite: 28]
 threshold = 50
 edge_binary = edges > threshold
 
-# שמירה והצגה [cite: 30]
-result_image = Image.fromarray((edge_binary * 255).astype(np.uint8))
-result_image.save("my_edges.png")
-
+# 5. הצגת התמונה ושמירתה כקובץ PNG [cite: 30]
 plt.imshow(edge_binary, cmap="gray")
 plt.axis("off")
 plt.show()
+
+# שמירה לקובץ כפי שנדרש
+result_image = Image.fromarray((edge_binary * 255).astype(np.uint8))
+result_image.save("my_edges.png")
+print("Saved edge detection result to my_edges.png")
